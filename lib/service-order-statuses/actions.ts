@@ -1,6 +1,6 @@
 "use server";
 
-import { ServiceOrderStatusRole } from "@prisma/client";
+import type { ServiceOrderStatusRole } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { normalizeName } from "@/lib/service-name";
 import { t } from "@/lib/i18n";

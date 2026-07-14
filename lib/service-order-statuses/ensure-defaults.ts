@@ -1,4 +1,4 @@
-import { ServiceOrderStatusRole } from "@prisma/client";
+import type { ServiceOrderStatusRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { normalizeName } from "@/lib/service-name";
 
