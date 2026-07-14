@@ -10,9 +10,12 @@ export function Header({ userName, userEmail, companyName }: HeaderProps) {
   return (
     <header className="flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 md:px-6">
       <div className="flex min-w-0 items-center gap-3">
-        <span className="text-sm font-semibold tracking-tight text-slate-900">
-          ErpModular
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/modsystem_logo_primary.svg"
+          alt="ModSystem"
+          className="h-8 w-auto"
+        />
         <span className="hidden truncate text-sm text-slate-500 sm:inline">
           {companyName}
         </span>

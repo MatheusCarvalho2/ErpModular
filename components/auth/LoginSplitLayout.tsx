@@ -21,10 +21,13 @@ export function LoginSplitLayout({ children }: LoginSplitLayoutProps) {
         />
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/40 to-slate-950/70" />
         <div className="relative z-10 flex h-full flex-col justify-end p-12 text-white">
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-white/70">
-            ErpModular
-          </p>
-          <h2 className="mt-3 max-w-md text-3xl font-semibold leading-tight">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/modsystem_icon.svg"
+            alt=""
+            className="h-14 w-14"
+          />
+          <h2 className="mt-6 max-w-md text-3xl font-semibold leading-tight">
             Gestão integrada para o dia a dia da sua empresa
           </h2>
         </div>

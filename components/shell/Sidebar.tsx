@@ -41,6 +41,22 @@ export async function Sidebar() {
             {t("nav.clients")}
           </Link>
         ) : null}
+        {can("serviceOrders:list") ? (
+          <Link
+            href="/app/ordens-servico"
+            className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+          >
+            {t("nav.orders")}
+          </Link>
+        ) : null}
+        {can("serviceOrderStatuses:list") ? (
+          <Link
+            href="/app/ordens-servico/status"
+            className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+          >
+            {t("nav.orderStatuses")}
+          </Link>
+        ) : null}
         {isAdmin ? (
           <Link
             href="/app/grupos-permissao"

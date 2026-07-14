@@ -10,5 +10,5 @@ test("matriz de Operadores só lista permissões de negócio", async ({ page }) 
     .click();
   await expect(page.getByTestId("permission-matrix")).toBeVisible();
   await expect(page.getByText(/remover admin|gerir grupo admin/i)).toHaveCount(0);
-  await expect(page.locator("[data-permission]")).toHaveCount(4);
+  await expect(page.locator("[data-permission]")).toHaveCount(25);
 });

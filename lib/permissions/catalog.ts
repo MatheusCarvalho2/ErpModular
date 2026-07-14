@@ -22,6 +22,15 @@ export const PERMISSION_KEYS = [
   "clientProducts:create",
   "clientProducts:update",
   "clientProducts:setActive",
+  "serviceOrders:list",
+  "serviceOrders:create",
+  "serviceOrders:update",
+  "serviceOrders:correctLinks",
+  "serviceOrders:editClosed",
+  "serviceOrderStatuses:list",
+  "serviceOrderStatuses:create",
+  "serviceOrderStatuses:update",
+  "serviceOrderStatuses:setActive",
 ] as const;
 
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];
@@ -33,7 +42,12 @@ export type PermissionResource = {
 };
 
 function crudActions(
-  prefix: "services" | "products" | "clients" | "clientProducts",
+  prefix:
+    | "services"
+    | "products"
+    | "clients"
+    | "clientProducts"
+    | "serviceOrderStatuses",
 ): { key: PermissionKey; labelKey: string }[] {
   return [
     { key: `${prefix}:list`, labelKey: "permissionGroups.action.list" },
@@ -67,10 +81,41 @@ export const PERMISSION_MATRIX: PermissionResource[] = [
     labelKey: "permissionGroups.resource.clientProducts",
     actions: crudActions("clientProducts"),
   },
+  {
+    resource: "serviceOrders",
+    labelKey: "permissionGroups.resource.serviceOrders",
+    actions: [
+      { key: "serviceOrders:list", labelKey: "permissionGroups.action.list" },
+      { key: "serviceOrders:create", labelKey: "permissionGroups.action.create" },
+      { key: "serviceOrders:update", labelKey: "permissionGroups.action.update" },
+      {
+        key: "serviceOrders:correctLinks",
+        labelKey: "permissionGroups.action.correctLinks",
+      },
+      {
+        key: "serviceOrders:editClosed",
+        labelKey: "permissionGroups.action.editClosed",
+      },
+    ],
+  },
+  {
+    resource: "serviceOrderStatuses",
+    labelKey: "permissionGroups.resource.serviceOrderStatuses",
+    actions: crudActions("serviceOrderStatuses"),
+  },
 ];
 
 export function businessPermissionKeys(): PermissionKey[] {
   return [...PERMISSION_KEYS];
+}
+
+export function operadoresPermissionKeys(): PermissionKey[] {
+  return PERMISSION_KEYS.filter(
+    (key) =>
+      !key.startsWith("serviceOrderStatuses:") &&
+      key !== "serviceOrders:correctLinks" &&
+      key !== "serviceOrders:editClosed",
+  );
 }
 
 export function isBusinessPermissionKey(key: string): key is PermissionKey {

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ErpModular",
+  title: "ModSystem",
   description: "ERP modular — autenticação e shell do sistema",
 };
 

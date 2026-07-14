@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import {
   SYSTEM_KEY_ADMIN,
   SYSTEM_KEY_OPERADORES,
-  businessPermissionKeys,
+  operadoresPermissionKeys,
 } from "@/lib/permissions/catalog";
 
 export async function ensureCompanyPermissionPresets(companyId: string) {
@@ -34,10 +34,10 @@ export async function ensureCompanyPermissionPresets(companyId: string) {
     operadoresCreated = true;
   }
 
-  // Only seed full business grants on first creation — never re-add keys
+  // Only seed the daily-operational grants on first creation — never re-add keys
   // an admin intentionally removed (would undo customização de Operadores).
   if (operadoresCreated) {
-    const keys = businessPermissionKeys();
+    const keys = operadoresPermissionKeys();
     await prisma.permissionGrant.createMany({
       data: keys.map((permissionKey) => ({
         permissionGroupId: operadores.id,
