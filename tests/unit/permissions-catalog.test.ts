@@ -3,6 +3,7 @@ import {
   businessPermissionKeys,
   filterBusinessKeys,
   isBusinessPermissionKey,
+  operadoresPermissionKeys,
 } from "@/lib/permissions/catalog";
 
 describe("permissions catalog", () => {
@@ -24,5 +25,24 @@ describe("permissions catalog", () => {
       "services:list",
       "services:create",
     ]);
+  });
+
+  it("includes order permissions but excludes sensitive grants for Operadores", () => {
+    expect(businessPermissionKeys()).toContain("serviceOrders:correctLinks");
+    expect(businessPermissionKeys()).toContain("serviceOrderStatuses:setActive");
+    expect(operadoresPermissionKeys()).toEqual(
+      expect.arrayContaining([
+        "serviceOrders:list",
+        "serviceOrders:create",
+        "serviceOrders:update",
+      ]),
+    );
+    expect(operadoresPermissionKeys()).not.toEqual(
+      expect.arrayContaining([
+        "serviceOrders:correctLinks",
+        "serviceOrders:editClosed",
+        "serviceOrderStatuses:list",
+      ]),
+    );
   });
 });
