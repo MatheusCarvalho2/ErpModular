@@ -28,6 +28,8 @@ Abra [http://localhost:3000](http://localhost:3000).
 | Admin | `admin@demo.local` | `Admin123!` | Empresa Demo |
 | Operadores | `membro@demo.local` | `Membro123!` | Empresa Demo |
 | Admin (outra) | `admin@outra.local` | `Admin123!` | Outra Empresa |
+| Operador da plataforma | `plataforma@demo.local` | `Admin123!` | Backoffice (`/backoffice/login`) |
+| Usuário inativo | `inativo@demo.local` | `Membro123!` | Empresa Demo (login ERP bloqueado) |
 
 O grupo **Operadores** nasce com CRUD de negócio completo (Serviços, Produtos, Clientes, Vínculos). Admin pode restringir no módulo Grupos de permissão.
 
@@ -39,6 +41,7 @@ O grupo **Operadores** nasce com CRUD de negócio completo (Serviços, Produtos,
 | Produtos | **Air fryer** (ativo) |
 | Clientes | **Maria Demo** `(11) 98888-0001`, **José Demo** `(11) 98888-0002` |
 | Vínculos | Maria → Air fryer `#1`, José → Air fryer `#2` |
+| Empresas | Demo + Outra (ativas), **Empresa Inativa Demo** (inativa) |
 
 Outra Empresa: serviço/produto próprios; sem clientes da Demo.
 
@@ -47,6 +50,8 @@ Outra Empresa: serviço/produto próprios; sem clientes da Demo.
 | Rota | Descrição |
 |------|-----------|
 | `/login` | Login |
+| `/backoffice/login` | Login do backoffice |
+| `/backoffice` | Dashboard do backoffice |
 | `/app` | Shell autenticado |
 | `/app/servicos` | Serviços |
 | `/app/produtos` | Catálogo de produtos |
