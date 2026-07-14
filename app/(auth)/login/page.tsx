@@ -6,8 +6,11 @@ import { LoginForm } from "@/components/auth/LoginForm";
 
 export default async function LoginPage() {
   const session = await auth();
-  if (session) {
+  if (session?.sessionKind === "erp") {
     redirect("/app");
+  }
+  if (session?.sessionKind === "platform") {
+    redirect("/backoffice");
   }
 
   return (

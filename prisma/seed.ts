@@ -187,39 +187,60 @@ async function main() {
 
   const company = await prisma.company.upsert({
     where: { slug: "demo" },
-    update: { name: "Empresa Demo" },
+    update: { name: "Empresa Demo", active: true },
     create: {
       name: "Empresa Demo",
       slug: "demo",
+      active: true,
     },
   });
 
   const otherCompany = await prisma.company.upsert({
     where: { slug: "outra" },
-    update: { name: "Outra Empresa" },
+    update: { name: "Outra Empresa", active: true },
     create: {
       name: "Outra Empresa",
       slug: "outra",
+      active: true,
+    },
+  });
+
+  const inactiveCompany = await prisma.company.upsert({
+    where: { slug: "inativa-demo" },
+    update: { name: "Empresa Inativa Demo", active: false },
+    create: {
+      name: "Empresa Inativa Demo",
+      slug: "inativa-demo",
+      active: false,
     },
   });
 
   await ensureCompanyPermissionPresets(company.id);
   await ensureCompanyPermissionPresets(otherCompany.id);
+  await ensureCompanyPermissionPresets(inactiveCompany.id);
   await resetOperadoresToOperationalBusiness(company.id);
   await resetOperadoresToOperationalBusiness(otherCompany.id);
+  await resetOperadoresToOperationalBusiness(inactiveCompany.id);
   await ensureDefaultServiceOrderStatuses(company.id);
   await ensureDefaultServiceOrderStatuses(otherCompany.id);
+  await ensureDefaultServiceOrderStatuses(inactiveCompany.id);
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@demo.local" },
     update: {
       name: "Admin Demo",
       passwordHash: adminPasswordHash,
+      active: true,
+      isPlatformOperator: false,
+      mustChangePassword: false,
     },
     create: {
       email: "admin@demo.local",
       name: "Admin Demo",
       passwordHash: adminPasswordHash,
+      active: true,
+      isPlatformOperator: false,
+      mustChangePassword: false,
     },
   });
 
@@ -234,11 +255,17 @@ async function main() {
     update: {
       name: "Membro Demo",
       passwordHash: memberPasswordHash,
+      active: true,
+      isPlatformOperator: false,
+      mustChangePassword: false,
     },
     create: {
       email: "membro@demo.local",
       name: "Membro Demo",
       passwordHash: memberPasswordHash,
+      active: true,
+      isPlatformOperator: false,
+      mustChangePassword: false,
     },
   });
 
@@ -253,11 +280,17 @@ async function main() {
     update: {
       name: "Admin Outra",
       passwordHash: adminPasswordHash,
+      active: true,
+      isPlatformOperator: false,
+      mustChangePassword: false,
     },
     create: {
       email: "admin@outra.local",
       name: "Admin Outra",
       passwordHash: adminPasswordHash,
+      active: true,
+      isPlatformOperator: false,
+      mustChangePassword: false,
     },
   });
 
@@ -265,6 +298,55 @@ async function main() {
     userId: otherAdmin.id,
     companyId: otherCompany.id,
     systemKey: SYSTEM_KEY_ADMIN,
+  });
+
+  const platformOperator = await prisma.user.upsert({
+    where: { email: "plataforma@demo.local" },
+    update: {
+      name: "Operador da Plataforma",
+      passwordHash: adminPasswordHash,
+      active: true,
+      isPlatformOperator: true,
+      mustChangePassword: false,
+    },
+    create: {
+      email: "plataforma@demo.local",
+      name: "Operador da Plataforma",
+      passwordHash: adminPasswordHash,
+      active: true,
+      isPlatformOperator: true,
+      mustChangePassword: false,
+    },
+  });
+
+  // Operador de plataforma não possui Membership
+  await prisma.membership.deleteMany({
+    where: { userId: platformOperator.id },
+  });
+
+  const inactiveUser = await prisma.user.upsert({
+    where: { email: "inativo@demo.local" },
+    update: {
+      name: "Usuário Inativo Demo",
+      passwordHash: memberPasswordHash,
+      active: false,
+      isPlatformOperator: false,
+      mustChangePassword: false,
+    },
+    create: {
+      email: "inativo@demo.local",
+      name: "Usuário Inativo Demo",
+      passwordHash: memberPasswordHash,
+      active: false,
+      isPlatformOperator: false,
+      mustChangePassword: false,
+    },
+  });
+
+  await upsertMembership({
+    userId: inactiveUser.id,
+    companyId: company.id,
+    systemKey: SYSTEM_KEY_OPERADORES,
   });
 
   await upsertService({
@@ -386,10 +468,13 @@ async function main() {
 
   console.log("Seed OK:", {
     company: company.slug,
+    inactiveCompany: inactiveCompany.slug,
     admin: admin.email,
     member: member.email,
+    inactiveUser: inactiveUser.email,
     otherCompany: otherCompany.slug,
     otherAdmin: otherAdmin.email,
+    platformOperator: platformOperator.email,
     product: airFryer.name,
     clients: [maria.name, jose.name],
   });

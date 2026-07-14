@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/shell/Header";
 import { Sidebar } from "@/components/shell/Sidebar";
+import { prisma } from "@/lib/prisma";
 
 export default async function AppLayout({
   children,
@@ -9,8 +10,16 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user || session.sessionKind !== "erp") {
     redirect("/login");
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { mustChangePassword: true },
+  });
+  if (dbUser?.mustChangePassword) {
+    redirect("/change-password");
   }
 
   return (

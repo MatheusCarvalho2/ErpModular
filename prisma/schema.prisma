@@ -17,6 +17,7 @@ model Company {
   id               String            @id @default(cuid())
   name             String
   slug             String            @unique
+  active           Boolean           @default(true)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   memberships      Membership[]
@@ -30,13 +31,16 @@ model Company {
 }
 
 model User {
-  id           String       @id @default(cuid())
-  email        String       @unique
-  passwordHash String
-  name         String
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  membership   Membership?
+  id                 String       @id @default(cuid())
+  email              String       @unique
+  passwordHash       String
+  name               String
+  active             Boolean      @default(true)
+  isPlatformOperator Boolean      @default(false)
+  mustChangePassword Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  membership         Membership?
 }
 
 model Membership {
