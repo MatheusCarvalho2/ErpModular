@@ -211,13 +211,41 @@ Check if `.specify/extensions.yml` exists in the project root.
     To execute: `/{command}`
     ```
 
+## Finalize: Migrate, Commit, Push
+
+**You MUST complete this section after Implementation + hooks, before the Completion Report.**
+
+Do not wait for the user to ask. When implementation tasks are done (or as far as this run completed):
+
+1. **Migrations (if applicable)**:
+   - If this feature added or changed files under `prisma/migrations/` or `prisma/schema.prisma`, run from repo root:
+     - `npx prisma generate` (if the client is stale / generate failed earlier due to locks, stop processes holding the query engine and retry)
+     - `npx prisma migrate deploy`
+   - If `prisma/seed.ts` was updated for the feature, also run `npx prisma db seed`
+   - If neither schema nor migrations changed, skip migrate/seed silently
+
+2. **Commit** (required when there are uncommitted changes):
+   - Follow the project's git commit safety protocol (no force, no amend unless rules allow, no secrets)
+   - Stage relevant feature files (not `.env` / credentials)
+   - Create a concise commit focused on why (1–2 sentences), via HEREDOC
+
+3. **Push to the current branch** (required after a successful commit, or if the branch is ahead of remote):
+   - Determine current branch (`git rev-parse --abbrev-ref HEAD`)
+   - Prefer the feature branch from Spec Kit (`FEATURE_BRANCH` / plan / `.specify/feature.json` context). If still on `main`/`master` with feature work that should live on the feature branch, create/switch to that branch (e.g. `005-cadastro-produtos`) before push when the plan names one
+   - `git push -u origin HEAD` (request network / full permissions as needed)
+   - Do **not** create a pull request unless the user asked for one
+
+4. Include in the Completion Report: migrate/seed commands run (or skipped), commit hash/message, branch name, and remote push result (URL or `branch → origin/branch`).
+
 ## Completion Report
 
-Report final status with summary of completed work.
+Report final status with summary of completed work, plus migrate/commit/push outcomes from Finalize.
 
 ## Done When
 
 - [ ] All tasks in tasks.md completed and marked `[X]`
 - [ ] Implementation validated against specification, plan, and test coverage
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
+- [ ] Pending Prisma migrations deployed (and seed run if seed changed) when applicable
+- [ ] Changes committed and pushed to the feature/current branch
 - [ ] Completion reported to user with summary of completed work
