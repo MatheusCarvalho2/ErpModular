@@ -4,7 +4,12 @@ import { normalizeName } from "../lib/service-name";
 import { normalizeText } from "../lib/normalize-text";
 import { normalizePhoneDigits } from "../lib/phone";
 import { ensureCompanyPermissionPresets } from "../lib/permission-groups/presets";
-import { businessPermissionKeys, SYSTEM_KEY_ADMIN, SYSTEM_KEY_OPERADORES } from "../lib/permissions/catalog";
+import {
+  operadoresPermissionKeys,
+  SYSTEM_KEY_ADMIN,
+  SYSTEM_KEY_OPERADORES,
+} from "../lib/permissions/catalog";
+import { ensureDefaultServiceOrderStatuses } from "../lib/service-order-statuses/ensure-defaults";
 
 const prisma = new PrismaClient();
 
@@ -162,12 +167,12 @@ async function upsertMembership(params: {
   });
 }
 
-async function resetOperadoresToFullBusiness(companyId: string) {
+async function resetOperadoresToOperationalBusiness(companyId: string) {
   const { operadores } = await ensureCompanyPermissionPresets(companyId);
   await prisma.permissionGrant.deleteMany({
     where: { permissionGroupId: operadores.id },
   });
-  const keys = businessPermissionKeys();
+  const keys = operadoresPermissionKeys();
   await prisma.permissionGrant.createMany({
     data: keys.map((permissionKey) => ({
       permissionGroupId: operadores.id,
@@ -200,8 +205,10 @@ async function main() {
 
   await ensureCompanyPermissionPresets(company.id);
   await ensureCompanyPermissionPresets(otherCompany.id);
-  await resetOperadoresToFullBusiness(company.id);
-  await resetOperadoresToFullBusiness(otherCompany.id);
+  await resetOperadoresToOperationalBusiness(company.id);
+  await resetOperadoresToOperationalBusiness(otherCompany.id);
+  await ensureDefaultServiceOrderStatuses(company.id);
+  await ensureDefaultServiceOrderStatuses(otherCompany.id);
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@demo.local" },
@@ -270,6 +277,15 @@ async function main() {
     active: true,
   });
 
+  const repairService = await upsertService({
+    companyId: company.id,
+    name: "Reparo de eletrodoméstico",
+    description: "Diagnóstico e reparo de eletrodomésticos.",
+    priceCents: 15000,
+    durationMinutes: 60,
+    active: true,
+  });
+
   await upsertService({
     companyId: company.id,
     name: "Alinhamento",
@@ -326,13 +342,47 @@ async function main() {
     active: true,
   });
 
-  await upsertClientProduct({
+  const joseAirFryer = await upsertClientProduct({
     companyId: company.id,
     clientId: jose.id,
     productId: airFryer.id,
     identifier: "2",
     active: true,
   });
+
+  const received = await prisma.serviceOrderStatus.findFirstOrThrow({
+    where: {
+      companyId: company.id,
+      nameNormalized: normalizeName("Recebido"),
+      active: true,
+    },
+  });
+  const existingOrder = await prisma.serviceOrder.findFirst({
+    where: {
+      companyId: company.id,
+      serviceId: repairService.id,
+      clientId: jose.id,
+      clientProductId: joseAirFryer.id,
+    },
+  });
+  if (existingOrder) {
+    await prisma.serviceOrder.update({
+      where: { id: existingOrder.id },
+      data: { statusId: received.id, priceCents: 15000 },
+    });
+  } else {
+    await prisma.serviceOrder.create({
+      data: {
+        companyId: company.id,
+        serviceId: repairService.id,
+        clientId: jose.id,
+        clientProductId: joseAirFryer.id,
+        statusId: received.id,
+        priceCents: 15000,
+        workDescription: "Ordem de demonstração.",
+      },
+    });
+  }
 
   console.log("Seed OK:", {
     company: company.slug,

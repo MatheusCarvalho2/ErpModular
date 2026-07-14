@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ServiceOrderStatusRole {
+  OPERATIONAL
+  COMPLETED
+  CANCELLED
+}
+
 model Company {
   id               String            @id @default(cuid())
   name             String
@@ -19,6 +25,8 @@ model Company {
   clients          Client[]
   clientProducts   ClientProduct[]
   permissionGroups PermissionGroup[]
+  serviceOrderStatuses ServiceOrderStatus[]
+  serviceOrders         ServiceOrder[]
 }
 
 model User {
@@ -83,6 +91,7 @@ model Service {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   company            Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  serviceOrders      ServiceOrder[]
 
   @@index([companyId, active])
 }
@@ -114,6 +123,7 @@ model Client {
   updatedAt       DateTime        @updatedAt
   company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   clientProducts  ClientProduct[]
+  serviceOrders   ServiceOrder[]
 
   @@index([companyId, active])
   @@index([companyId, phoneNormalized])
@@ -135,8 +145,51 @@ model ClientProduct {
   company              Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   client               Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   product              Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  serviceOrders        ServiceOrder[]
 
   @@index([companyId, active])
   @@index([clientId, active])
   @@index([companyId, identifierNormalized])
+}
+
+model ServiceOrderStatus {
+  id               String                 @id @default(cuid())
+  companyId        String
+  name             String
+  nameNormalized   String
+  sortOrder        Int
+  isDefaultInitial Boolean                @default(false)
+  role             ServiceOrderStatusRole
+  active           Boolean                @default(true)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  company          Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  serviceOrders    ServiceOrder[]
+
+  @@index([companyId, active])
+  @@index([companyId, sortOrder])
+}
+
+model ServiceOrder {
+  id              String             @id @default(cuid())
+  companyId       String
+  serviceId       String
+  clientId        String
+  clientProductId String
+  statusId        String
+  priceCents      Int
+  workDescription String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  company         Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  service         Service            @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  client          Client             @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientProduct   ClientProduct      @relation(fields: [clientProductId], references: [id], onDelete: Restrict)
+  status          ServiceOrderStatus @relation(fields: [statusId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, statusId])
+  @@index([companyId, createdAt])
+  @@index([serviceId])
+  @@index([clientId])
+  @@index([clientProductId])
 }
