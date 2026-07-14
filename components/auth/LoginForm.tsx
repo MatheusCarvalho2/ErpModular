@@ -1,13 +1,22 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useSyncExternalStore } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+
+function useIsClient() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/app";
+  const ready = useIsClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -73,7 +82,13 @@ export function LoginForm() {
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4" noValidate>
+      <form
+        onSubmit={onSubmit}
+        className="space-y-4"
+        noValidate
+        method="post"
+        data-ready={ready ? "true" : "false"}
+      >
         <div className="space-y-1.5">
           <label htmlFor="email" className="block text-sm font-medium text-slate-700">
             E-mail

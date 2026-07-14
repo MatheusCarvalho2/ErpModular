@@ -8,12 +8,17 @@ datasource db {
 }
 
 model Company {
-  id          String       @id @default(cuid())
-  name        String
-  slug        String       @unique
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  memberships Membership[]
+  id               String            @id @default(cuid())
+  name             String
+  slug             String            @unique
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  memberships      Membership[]
+  services         Service[]
+  products         Product[]
+  clients          Client[]
+  clientProducts   ClientProduct[]
+  permissionGroups PermissionGroup[]
 }
 
 model User {
@@ -27,13 +32,111 @@ model User {
 }
 
 model Membership {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  companyId String
-  role      String   @default("MEMBER")
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  id                String          @id @default(cuid())
+  userId            String          @unique
+  companyId         String
+  permissionGroupId String
+  createdAt         DateTime        @default(now())
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  permissionGroup   PermissionGroup @relation(fields: [permissionGroupId], references: [id])
 
   @@index([companyId])
+  @@index([permissionGroupId])
+}
+
+model PermissionGroup {
+  id          String            @id @default(cuid())
+  companyId   String
+  name        String
+  /// ADMIN | OPERADORES | null (custom)
+  systemKey   String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  grants      PermissionGrant[]
+  memberships Membership[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model PermissionGrant {
+  id                String          @id @default(cuid())
+  permissionGroupId String
+  permissionKey     String
+  permissionGroup   PermissionGroup @relation(fields: [permissionGroupId], references: [id], onDelete: Cascade)
+
+  @@unique([permissionGroupId, permissionKey])
+}
+
+model Service {
+  id                 String   @id @default(cuid())
+  companyId          String
+  name               String
+  nameNormalized     String
+  description        String
+  productDescription String?
+  priceCents         Int?
+  durationMinutes    Int?
+  active             Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  company            Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, active])
+}
+
+model Product {
+  id             String          @id @default(cuid())
+  companyId      String
+  name           String
+  nameNormalized String
+  description    String?
+  active         Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  clientProducts ClientProduct[]
+
+  @@index([companyId, active])
+}
+
+model Client {
+  id              String          @id @default(cuid())
+  companyId       String
+  name            String
+  phone           String
+  phoneNormalized String
+  personGroupId   String?
+  active          Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  clientProducts  ClientProduct[]
+
+  @@index([companyId, active])
+  @@index([companyId, phoneNormalized])
+  @@index([companyId, personGroupId])
+}
+
+model ClientProduct {
+  id                   String   @id @default(cuid())
+  companyId            String
+  clientId             String
+  productId            String
+  identifier           String
+  identifierNormalized String
+  serialNumber         String?
+  notes                String?
+  active               Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  company              Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client               Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  product              Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, active])
+  @@index([clientId, active])
+  @@index([companyId, identifierNormalized])
 }
