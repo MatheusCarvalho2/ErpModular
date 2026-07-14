@@ -73,10 +73,13 @@ export function LoginForm() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
-          ErpModular
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold text-slate-900">Entrar</h1>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/modsystem_logo_primary.svg"
+          alt="ModSystem"
+          className="h-12 w-auto"
+        />
+        <h1 className="mt-6 text-3xl font-semibold text-slate-900">Entrar</h1>
         <p className="mt-2 text-sm text-slate-600">
           Acesse o sistema com seu e-mail e senha.
         </p>
