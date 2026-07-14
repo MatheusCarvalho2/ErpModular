@@ -39,8 +39,22 @@
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+*Source: `.specify/memory/constitution.md` (ErpModular Constitution)*
 
-[Gates determined based on constitution file]
+- **I. Automated Testing**: Critical paths of this feature have (or will
+  have) automated coverage; any exception is documented with manual
+  verification. Gate fails if testable behavior ships without tests or
+  exception.
+- **II. Seed When Necessary**: If the feature needs predictable data to
+  demo/test, plan includes idempotent seed updates and documented
+  fixtures (pt-BR). Gate N/A only when no fixtures are required.
+- **III. Internationalization**: User-facing copy uses the i18n layer;
+  only `pt-BR` is required now. Gate fails if new hard-coded UI strings
+  are proposed outside i18n.
+- **IV. Spec-Driven Delivery**: Plan/tasks derive from the feature spec;
+  acceptance scenarios remain the source of truth for tests.
+- **V. Simplicity**: No extra locales, fixtures, or abstractions beyond
+  current stories; justify any conflict in Complexity Tracking.
 
 ## Project Structure
 

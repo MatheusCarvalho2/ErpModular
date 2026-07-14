@@ -1,0 +1,32 @@
+---
+description: ErpModular constitution — tests, seed, i18n (pt-BR)
+alwaysApply: true
+---
+
+# ErpModular project principles
+
+Source of truth: `.specify/memory/constitution.md` (v1.0.0).
+
+## Automated tests
+
+- Critical paths of a feature MUST have automated tests whenever possible.
+- Prefer E2E/integration for user journeys; unit tests for non-trivial pure logic.
+- If tests are impractical, document the exception and a manual check in spec/tasks.
+- Do not mark feature work done without tests or a documented exception.
+
+## Seed
+
+- When develop/demo/test needs predictable data, extend the idempotent seed and document fixtures (credentials, purpose) in pt-BR.
+- Seed only what the feature needs; no unrelated domain junk.
+- Re-running seed must not duplicate managed fixtures.
+
+## i18n
+
+- All user-facing UI copy MUST go through the project i18n layer (no hard-coded UI strings once i18n applies to that surface).
+- Only locale required now: `pt-BR`. Do not ship other locales unless specified.
+- Team docs (README, specs) stay in pt-BR and do not need the runtime i18n layer.
+
+## Delivery
+
+- Spec Kit flow: specify → plan (Constitution Check) → tasks → implement.
+- Prefer the simplest design that satisfies the spec and these rules.

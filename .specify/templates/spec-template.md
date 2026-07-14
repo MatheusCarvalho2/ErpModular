@@ -8,6 +8,14 @@
 
 **Input**: User description: "$ARGUMENTS"
 
+<!--
+  CONSTITUTION (see `.specify/memory/constitution.md`):
+  - Automated tests for critical paths whenever possible
+  - Seed fixtures when needed for develop/demo/test (idempotent, documented)
+  - All user-facing copy via i18n; active locale pt-BR only for now
+  Reflect these in User Scenarios, Requirements, and Assumptions as applicable.
+-->
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--
@@ -17,10 +25,13 @@
 
   Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
   Think of each story as a standalone slice of functionality that can be:
-  - Developed independently
-  - Tested independently
-  - Deployed independently
-  - Demonstrated to users independently
+    - Developed independently
+    - Tested independently
+    - Deployed independently
+    - Demonstrated to users independently
+
+  Prefer acceptance scenarios that can become automated tests. If a scenario
+  cannot be automated, note the manual verification path.
 -->
 
 ### User Story 1 - [Brief Title] (Priority: P1)
@@ -129,3 +140,6 @@
 - [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
 - [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
 - [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+- Critical paths will have automated tests unless an exception is documented (Constitution I)
+- If fixtures are required, seed will be extended/documented (Constitution II)
+- User-facing copy uses i18n with pt-BR as the only required locale for now (Constitution III)
