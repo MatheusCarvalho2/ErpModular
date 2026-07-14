@@ -1,20 +1,37 @@
 import { expect, test } from "@playwright/test";
 import { CREDENTIALS, loginAs, loginPlatformAs } from "./helpers";
 
-test("inactivate and reactivate user blocks ERP login", async ({ page }) => {
-  const suffix = Date.now();
+async function provisionIsolatedUser(
+  page: import("@playwright/test").Page,
+  suffix: string,
+  password: string,
+) {
+  const companyName = `Toggle Co ${suffix}`;
   const email = `toggle.user.${suffix}@test.local`;
-  const password = "Toggle123!";
 
   await loginPlatformAs(page);
+  await page.getByRole("link", { name: "Empresas" }).click();
+  await page.getByRole("link", { name: "Nova empresa" }).click();
+  await page.getByLabel("Nome da empresa").fill(companyName);
+  await page.getByRole("button", { name: "Criar empresa" }).click();
+  await expect(page.getByText(companyName)).toBeVisible({ timeout: 15_000 });
+
   await page.getByRole("link", { name: "Usuários" }).click();
   await page.getByRole("link", { name: "Novo usuário" }).click();
   await page.getByLabel("Nome", { exact: true }).fill(`Toggle ${suffix}`);
   await page.getByLabel("E-mail").fill(email);
   await page.getByLabel("Senha inicial").fill(password);
-  await page.getByLabel("Empresa").selectOption({ label: "Empresa Demo" });
+  await page.getByLabel("Empresa").selectOption({ label: companyName });
   await page.getByRole("button", { name: "Criar usuário" }).click();
   await expect(page.getByText(email)).toBeVisible({ timeout: 15_000 });
+
+  return { email, companyName };
+}
+
+test("inactivate and reactivate user blocks ERP login", async ({ page }) => {
+  const suffix = String(Date.now());
+  const password = "Toggle123!";
+  const { email } = await provisionIsolatedUser(page, suffix, password);
 
   const row = page.locator("tr", { hasText: email });
   await row.getByRole("button", { name: "Inativar" }).click();

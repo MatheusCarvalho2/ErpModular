@@ -2,19 +2,26 @@ import { expect, test } from "@playwright/test";
 import { loginPlatformAs } from "./helpers";
 
 test("reset password forces change before /app", async ({ page }) => {
-  const suffix = Date.now();
+  const suffix = String(Date.now());
+  const companyName = `Reset Co ${suffix}`;
   const email = `reset.${suffix}@test.local`;
   const initial = "Initial123!";
   const temporary = "Temporary123!";
   const next = "Changed123!";
 
   await loginPlatformAs(page);
+  await page.getByRole("link", { name: "Empresas" }).click();
+  await page.getByRole("link", { name: "Nova empresa" }).click();
+  await page.getByLabel("Nome da empresa").fill(companyName);
+  await page.getByRole("button", { name: "Criar empresa" }).click();
+  await expect(page.getByText(companyName)).toBeVisible({ timeout: 15_000 });
+
   await page.getByRole("link", { name: "Usuários" }).click();
   await page.getByRole("link", { name: "Novo usuário" }).click();
   await page.getByLabel("Nome", { exact: true }).fill(`Reset ${suffix}`);
   await page.getByLabel("E-mail").fill(email);
   await page.getByLabel("Senha inicial").fill(initial);
-  await page.getByLabel("Empresa").selectOption({ label: "Empresa Demo" });
+  await page.getByLabel("Empresa").selectOption({ label: companyName });
   await page.getByRole("button", { name: "Criar usuário" }).click();
   await expect(page.getByText(email)).toBeVisible({ timeout: 15_000 });
 
